@@ -16,11 +16,11 @@ export class TodoService {
   }
 
   async getTodoById(id: number) {
-    return await this.todoRepository.find({
-      where: {
-        id,
-      },
-    });
+    const todo = await this.todoRepository.findOneBy({ id });
+
+    if (!todo) throw new NotFoundException();
+
+    return todo;
   }
 
   async createTodo(createTodo: CreateTodoDto) {
@@ -30,22 +30,13 @@ export class TodoService {
   }
 
   async updateTodo(id: number, updateTodo: UpdateTodoDto) {
-    const todo = await this.todoRepository.findOne({ where: { id } });
-
-    if (!todo) {
-      throw new NotFoundException();
-    }
-
-    Object.assign(todo, updateTodo);
-    return this.todoRepository.save(todo);
+    return await this.todoRepository.update({ id }, { ...updateTodo });
   }
 
   async deleteTodo(id: number) {
-    const todo = await this.todoRepository.findOne({ where: { id } });
+    const todo = await this.todoRepository.findOneBy({ id });
 
-    if (!todo) {
-      throw new NotFoundException();
-    }
+    if (!todo) throw new NotFoundException();
 
     return this.todoRepository.delete(id);
   }

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -30,30 +31,30 @@ export class TodoController {
   }
 
   @Get('/:id')
-  async getTodo(@Param('id') id) {
+  async getTodo(@Param('id', ParseIntPipe) id: number) {
     const query = new GetTodoQuery(id);
     return await this.queryBus.execute(query);
   }
 
   @Post()
   async createTodo(@Body() createTodoDto: CreateTodoDto) {
-    const command = new CreateTodoCommand(
-      createTodoDto.name,
-      createTodoDto.due_date,
-    );
+    const command = new CreateTodoCommand(createTodoDto);
 
     return await this.commandBus.execute(command);
   }
 
   @Patch('/:id')
-  async updateTodo(@Param('id') id, @Body() updateTodoDto: UpdateTodoDto) {
+  async updateTodo(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTodoDto: UpdateTodoDto,
+  ) {
     const command = new UpdateTodoCommand(id, updateTodoDto);
     return await this.commandBus.execute(command);
   }
 
   @Delete('/:id')
-  deleteTodo(@Param('id') id) {
+  async deleteTodo(@Param('id', ParseIntPipe) id: number) {
     const command = new DeleteTodoCommand(id);
-    return this.commandBus.execute(command);
+    return await this.commandBus.execute(command);
   }
 }
