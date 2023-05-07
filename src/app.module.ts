@@ -4,9 +4,13 @@ import { AppService } from './app.service';
 import { TodoModule } from './todo/todo.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Todo } from './todo/entities/todo.entity';
+import { Project } from './project/entities/project.entity';
+import { ProjectModule } from './project/project.module';
+
 @Module({
   imports: [
     TodoModule,
+    ProjectModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -14,7 +18,7 @@ import { Todo } from './todo/entities/todo.entity';
       username: 'root',
       password: '',
       database: 'todo_db',
-      entities: [Todo],
+      entities: [Todo, Project],
       synchronize: true,
       dropSchema: false,
     }),

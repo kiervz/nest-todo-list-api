@@ -39,7 +39,6 @@ export class TodoController {
   @Post()
   async createTodo(@Body() createTodoDto: CreateTodoDto) {
     const command = new CreateTodoCommand(createTodoDto);
-
     return await this.commandBus.execute(command);
   }
 

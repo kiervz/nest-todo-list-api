@@ -6,4 +6,6 @@ export class CreateTodoDto {
 
   @IsNotEmpty({ message: 'The due date field is required' })
   due_date: Date;
+
+  project_id: number;
 }
