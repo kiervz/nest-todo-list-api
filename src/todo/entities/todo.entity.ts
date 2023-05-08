@@ -39,6 +39,9 @@ export class Todo {
   @UpdateDateColumn()
   updated_at: Date;
 
+  @Column({ nullable: true })
+  project_id: number;
+
   @ManyToOne(() => Project)
   @JoinColumn({ name: 'project_id' })
   project: Project;

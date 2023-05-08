@@ -1,13 +1,36 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateTodoCommand } from '../impl';
-import { TodoService } from '../../todo.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Todo } from 'src/todo/entities/todo.entity';
+import { InsertResult, Repository } from 'typeorm';
+import { Project } from 'src/project/entities/project.entity';
+import { NotFoundException } from '@nestjs/common';
 
 @CommandHandler(CreateTodoCommand)
 export class CreateTodoHandler implements ICommandHandler<CreateTodoCommand> {
-  constructor(private readonly todoService: TodoService) {}
+  constructor(
+    @InjectRepository(Todo) private todoRepository: Repository<Todo>,
+    @InjectRepository(Project) private projectRepository: Repository<Project>,
+  ) {}
 
-  async execute(command: CreateTodoCommand): Promise<any> {
-    const { createTodoDto } = command;
-    return await this.todoService.createTodo(createTodoDto);
+  async execute(command: CreateTodoCommand): Promise<InsertResult> {
+    let project: Project;
+
+    if (command.dto.project_id) {
+      project = await this.projectRepository.findOneBy({
+        id: command.dto.project_id,
+      });
+
+      if (!project) {
+        throw new NotFoundException('Project does not exist!');
+      }
+    }
+
+    const todo = this.todoRepository.create({
+      ...command.dto,
+      project,
+    });
+
+    return this.todoRepository.insert(todo);
   }
 }

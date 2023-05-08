@@ -1,4 +1,4 @@
 import { GetTodoHandler } from './get-todo.handler';
-import { GetAllTodoHandler } from './get-all-todo.handler';
+import { GetTodosHandler } from './get-todos.handler';
 
-export const QueryHandlers = [GetTodoHandler, GetAllTodoHandler];
+export const QueryHandlers = [GetTodoHandler, GetTodosHandler];

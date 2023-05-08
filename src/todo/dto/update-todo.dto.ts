@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 import { TodoStatus } from '../entities/todo.entity';
 
 export class UpdateTodoDto {
@@ -13,4 +13,7 @@ export class UpdateTodoDto {
     message: 'Status must be one of: ' + Object.values(TodoStatus).join(', '),
   })
   status: TodoStatus;
+
+  @IsOptional()
+  project_id?: number;
 }

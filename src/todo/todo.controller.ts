@@ -11,7 +11,7 @@ import {
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { GetTodoQuery, GetAllTodoQuery } from './queries/impl';
+import { GetTodoQuery, GetTodosQuery } from './queries/impl';
 import {
   CreateTodoCommand,
   DeleteTodoCommand,
@@ -27,19 +27,17 @@ export class TodoController {
 
   @Get()
   async get() {
-    return await this.queryBus.execute(new GetAllTodoQuery());
+    return await this.queryBus.execute(new GetTodosQuery());
   }
 
   @Get('/:id')
   async getTodo(@Param('id', ParseIntPipe) id: number) {
-    const query = new GetTodoQuery(id);
-    return await this.queryBus.execute(query);
+    return await this.queryBus.execute(new GetTodoQuery(id));
   }
 
   @Post()
   async createTodo(@Body() createTodoDto: CreateTodoDto) {
-    const command = new CreateTodoCommand(createTodoDto);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(new CreateTodoCommand(createTodoDto));
   }
 
   @Patch('/:id')
@@ -47,13 +45,13 @@ export class TodoController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTodoDto: UpdateTodoDto,
   ) {
-    const command = new UpdateTodoCommand(id, updateTodoDto);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(
+      new UpdateTodoCommand(id, updateTodoDto),
+    );
   }
 
   @Delete('/:id')
   async deleteTodo(@Param('id', ParseIntPipe) id: number) {
-    const command = new DeleteTodoCommand(id);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(new DeleteTodoCommand(id));
   }
 }

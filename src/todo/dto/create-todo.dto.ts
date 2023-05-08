@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateTodoDto {
   @IsNotEmpty({ message: 'The name field is required' })
@@ -7,5 +7,6 @@ export class CreateTodoDto {
   @IsNotEmpty({ message: 'The due date field is required' })
   due_date: Date;
 
-  project_id: number;
+  @IsOptional()
+  project_id?: number;
 }
