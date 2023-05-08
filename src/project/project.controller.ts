@@ -32,14 +32,14 @@ export class ProjectController {
 
   @Get('/:id')
   async getProjectById(@Param('id', ParseIntPipe) id: number) {
-    const query = new GetProjectQuery(id);
-    return await this.queryBus.execute(query);
+    return await this.queryBus.execute(new GetProjectQuery(id));
   }
 
   @Post()
   async createProject(@Body() createProjectDto: CreateProjectDto) {
-    const command = new CreateProjectCommand(createProjectDto);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(
+      new CreateProjectCommand(createProjectDto),
+    );
   }
 
   @Patch('/:id')
@@ -47,13 +47,13 @@ export class ProjectController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProjectDto: UpdateProjectDto,
   ) {
-    const command = new UpdateProjectCommand(id, updateProjectDto);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(
+      new UpdateProjectCommand(id, updateProjectDto),
+    );
   }
 
   @Delete('/:id')
   async deleteProject(@Param('id', ParseIntPipe) id: number) {
-    const command = new DeleteProjectCommand(id);
-    return await this.commandBus.execute(command);
+    return await this.commandBus.execute(new DeleteProjectCommand(id));
   }
 }

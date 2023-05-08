@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
@@ -10,6 +9,6 @@ import { QueryHandlers } from './queries/handlers';
 @Module({
   imports: [TypeOrmModule.forFeature([Project]), CqrsModule],
   controllers: [ProjectController],
-  providers: [ProjectService, ...CommandHandlers, ...QueryHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers],
 })
 export class ProjectModule {}
