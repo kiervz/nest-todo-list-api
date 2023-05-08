@@ -26,10 +26,11 @@ export class CreateTodoHandler implements ICommandHandler<CreateTodoCommand> {
       }
     }
 
-    const todo = this.todoRepository.create({
-      ...command.dto,
-      project,
-    });
+    const todo = new Todo();
+
+    todo.name = command.dto.name;
+    todo.due_date = command.dto.due_date;
+    todo.project = project;
 
     return this.todoRepository.insert(todo);
   }
