@@ -1,7 +1,7 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetAllProjectQuery } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from 'src/project/entities/project.entity';
+import { Project } from 'src/entities/project';
 import { Repository } from 'typeorm';
 
 @QueryHandler(GetAllProjectQuery)

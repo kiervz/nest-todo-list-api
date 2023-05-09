@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateTodoCommand } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Todo } from 'src/todo/entities/todo.entity';
+import { Todo } from 'src/entities/todo';
 import { InsertResult, Repository } from 'typeorm';
-import { Project } from 'src/project/entities/project.entity';
+import { Project } from 'src/entities/project';
 import { NotFoundException } from '@nestjs/common';
 
 @CommandHandler(CreateTodoCommand)

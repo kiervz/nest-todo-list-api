@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteProjectCommand } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from 'src/project/entities/project.entity';
+import { Project } from 'src/entities/project';
 import { DeleteResult, Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 

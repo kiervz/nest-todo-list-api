@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { TodoStatus } from '../entities/todo.entity';
+import { TodoStatus } from '../../entities/todo';
 
 export class UpdateTodoDto {
   @IsNotEmpty({ message: 'The name field is required' })

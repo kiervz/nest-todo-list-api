@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateProjectCommand } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from 'src/project/entities/project.entity';
+import { Project } from 'src/entities/project';
 import { Repository, UpdateResult } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 

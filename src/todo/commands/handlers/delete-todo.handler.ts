@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteTodoCommand } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Todo } from 'src/todo/entities/todo.entity';
+import { Todo } from 'src/entities/todo';
 import { DeleteResult, Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 

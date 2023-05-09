@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateProjectCommand } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from 'src/project/entities/project.entity';
+import { Project } from 'src/entities/project';
 import { InsertResult, Repository } from 'typeorm';
 
 @CommandHandler(CreateProjectCommand)

@@ -1,7 +1,7 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetTodoQuery } from '../impl';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Todo } from 'src/todo/entities/todo.entity';
+import { Todo } from 'src/entities/todo';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 
