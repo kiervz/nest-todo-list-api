@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { CommandHandlers } from './commands/handlers';
+import { QueryHandlers } from './queries/handlers';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -21,6 +22,6 @@ import { JwtStrategy } from './jwt.strategy';
     CqrsModule,
   ],
   controllers: [AuthController],
-  providers: [...CommandHandlers, JwtStrategy],
+  providers: [...CommandHandlers, ...QueryHandlers, JwtStrategy],
 })
 export class AuthModule {}
