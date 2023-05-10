@@ -9,6 +9,7 @@ import { User } from 'src/entities/user';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { JwtStrategy } from './jwt.strategy';
     CqrsModule,
   ],
   controllers: [AuthController],
-  providers: [...CommandHandlers, ...QueryHandlers, JwtStrategy],
+  providers: [AuthService, ...CommandHandlers, ...QueryHandlers, JwtStrategy],
 })
 export class AuthModule {}

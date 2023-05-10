@@ -2,15 +2,18 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { SignInUserDto } from './dto/sign-in-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { SignInUserCommand } from './commands/impl';
+import { RefreshTokenCommand, SignInUserCommand } from './commands/impl';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GetUserQuery } from './queries/impl';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,5 +31,16 @@ export class AuthController {
   @Get('me')
   async me(@Request() req) {
     return await this.queryBus.execute(new GetUserQuery(req.id));
+  }
+
+  @Post('refresh-token')
+  async refreshToken(@Body() { refresh_token }: RefreshTokenDto) {
+    try {
+      return await this.commandBus.execute(
+        new RefreshTokenCommand(refresh_token),
+      );
+    } catch (err) {
+      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+    }
   }
 }
