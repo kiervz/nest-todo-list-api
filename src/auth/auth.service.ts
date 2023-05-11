@@ -68,9 +68,11 @@ export class AuthService {
   }
 
   private async updateRefreshToken(userId: number, refresh_token: string) {
-    const hashedRefreshToken = await this.hashData(refresh_token);
+    const hashedRefreshToken = refresh_token
+      ? await this.hashData(refresh_token)
+      : null;
 
-    return this.userRepository.update(
+    return await this.userRepository.update(
       { id: userId },
       { refresh_token: hashedRefreshToken },
     );
@@ -108,5 +110,13 @@ export class AuthService {
   ): Promise<boolean> {
     const match = await bcrypt.compare(enteredData, dbData);
     return match;
+  }
+
+  async signOut(userId: number) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    if (!user) throw new UnauthorizedException();
+
+    return this.updateRefreshToken(userId, null);
   }
 }
