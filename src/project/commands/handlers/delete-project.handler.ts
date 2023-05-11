@@ -1,25 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteProjectCommand } from '../impl';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from 'src/entities/project';
-import { DeleteResult, Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { DeleteResult } from 'typeorm';
+import { ProjectService } from 'src/project/project.service';
 
 @CommandHandler(DeleteProjectCommand)
 export class DeleteProjectHandler
   implements ICommandHandler<DeleteProjectCommand>
 {
-  constructor(
-    @InjectRepository(Project) private projectRepository: Repository<Project>,
-  ) {}
+  constructor(private readonly projectService: ProjectService) {}
 
   async execute(command: DeleteProjectCommand): Promise<DeleteResult> {
-    const project = await this.projectRepository.findOneBy({
-      id: command.id,
-    });
-
-    if (!project) throw new NotFoundException('Project does not exist!');
-
-    return this.projectRepository.delete(project.id);
+    return this.projectService.deleteProject(command.id);
   }
 }
