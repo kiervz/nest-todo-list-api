@@ -1,21 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteTodoCommand } from '../impl';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Todo } from 'src/entities/todo';
-import { DeleteResult, Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { DeleteResult } from 'typeorm';
+import { TodoService } from 'src/todo/todo.service';
 
 @CommandHandler(DeleteTodoCommand)
 export class DeleteTodoHandler implements ICommandHandler<DeleteTodoCommand> {
-  constructor(
-    @InjectRepository(Todo) private todoRepository: Repository<Todo>,
-  ) {}
+  constructor(private readonly todoService: TodoService) {}
 
   async execute(command: DeleteTodoCommand): Promise<DeleteResult> {
-    const todo = await this.todoRepository.findOneBy({ id: command.id });
-
-    if (!todo) throw new NotFoundException('Todo does not exist!');
-
-    return this.todoRepository.delete(todo.id);
+    return this.todoService.deleteTodo(command.id);
   }
 }

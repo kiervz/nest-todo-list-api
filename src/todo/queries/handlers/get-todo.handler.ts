@@ -1,26 +1,13 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetTodoQuery } from '../impl';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Todo } from 'src/entities/todo';
-import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { TodoService } from 'src/todo/todo.service';
 
 @QueryHandler(GetTodoQuery)
 export class GetTodoHandler implements IQueryHandler<GetTodoQuery> {
-  constructor(
-    @InjectRepository(Todo) private todoRepository: Repository<Todo>,
-  ) {}
+  constructor(private readonly todoService: TodoService) {}
 
   async execute(query: GetTodoQuery): Promise<Todo> {
-    const todo = await this.todoRepository.findOne({
-      where: {
-        id: query.id,
-      },
-      relations: ['project'],
-    });
-
-    if (!todo) throw new NotFoundException('Todo does not exist!');
-
-    return todo;
+    return this.todoService.getTodoById(query.id);
   }
 }
