@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -17,7 +18,9 @@ import {
   DeleteTodoCommand,
   UpdateTodoCommand,
 } from './commands/impl';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('todos')
 export class TodoController {
   constructor(

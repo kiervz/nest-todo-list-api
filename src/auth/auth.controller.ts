@@ -17,8 +17,8 @@ import {
   SignOutUserCommand,
 } from './commands/impl';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { GetUserQuery } from './queries/impl';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { GetUserByIdQuery } from './queries/impl';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +35,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@Request() req) {
-    return await this.queryBus.execute(new GetUserQuery(req.id));
+    return await this.queryBus.execute(new GetUserByIdQuery(req.user.id));
   }
 
   @Post('refresh-token')
@@ -53,6 +53,6 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   logout(@Request() req) {
-    return this.commandBus.execute(new SignOutUserCommand(req.user.userId));
+    return this.commandBus.execute(new SignOutUserCommand(req.user.id));
   }
 }

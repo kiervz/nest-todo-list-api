@@ -4,14 +4,27 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
 } from 'typeorm';
+import { User } from './user';
+import { UserDto } from 'src/user/dto/user.dto';
 
+@Index(['name', 'user_id'], { unique: true })
 @Entity({ name: 'projects' })
 export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: UserDto;
+
+  @Column()
+  user_id: number;
+
+  @Column()
   name: string;
 
   @CreateDateColumn()

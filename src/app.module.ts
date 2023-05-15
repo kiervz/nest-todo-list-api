@@ -8,12 +8,18 @@ import { dataSourceOptions } from 'db/data-source';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ClsModule } from 'nestjs-cls';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env', '.env.dev', '.env.prod'],
+    }),
+    // Register the ClsModule and automatically mount the ClsMiddleware
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
     }),
     TodoModule,
     ProjectModule,

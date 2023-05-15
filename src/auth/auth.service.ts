@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { GenerateTokenDto } from './dto/generate-token.dto';
 import { SignInUserDto } from './dto/sign-in-user.dto';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     @InjectRepository(User) private userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly cls: ClsService,
   ) {}
 
   async signIn(signInUserDto: SignInUserDto) {
@@ -31,6 +33,8 @@ export class AuthService {
       signInUserDto.password,
       user.password,
     );
+
+    this.cls.set('user', user);
 
     if (!isMatch) throw new UnauthorizedException();
 

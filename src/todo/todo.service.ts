@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Todo } from 'src/entities/todo';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -6,41 +6,36 @@ import { CreateTodoDto } from './dto/create-todo.dto';
 import { ProjectService } from 'src/project/project.service';
 import { Project } from 'src/entities/project';
 import { UpdateTodoDto } from './dto/update-todo.dto';
+import { TodoDto } from './dto/todo.dto';
+import { TodosDto } from './dto/todos.dto';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class TodoService {
   constructor(
     @InjectRepository(Todo) private todoRepository: Repository<Todo>,
-    private readonly projectService: ProjectService,
+    @Inject(ProjectService) private readonly projectService: ProjectService,
+    private readonly cls: ClsService,
   ) {}
 
-  async getAllTodo(): Promise<Todo[]> {
-    return await this.todoRepository.find({
-      relations: ['project'],
-      // select: {
-      //   id: true,
-      //   name: true,
-      //   status: true,
-      //   project: {
-      //     id: true,
-      //     name: true,
-      //   },
-      //   due_date: true,
-      //   created_at: true,
-      //   updated_at: true,
-      // },
+  async getAllTodo(): Promise<TodosDto> {
+    const todos = await this.todoRepository.find({
+      where: { user_id: this.cls.get('user').id },
+      relations: ['user', 'project'],
     });
+
+    return new TodosDto(todos);
   }
 
   async getTodoById(id: number): Promise<Todo> {
     const todo = await this.todoRepository.findOne({
-      where: { id },
-      relations: ['project'],
+      where: { id, user_id: this.cls.get('user').id },
+      relations: ['user', 'project'],
     });
 
     if (!todo) throw new NotFoundException('Todo does not exist!');
 
-    return todo;
+    return new TodoDto(todo);
   }
 
   async createTodo(createTodoDto: CreateTodoDto) {
@@ -56,6 +51,7 @@ export class TodoService {
 
     todo.name = createTodoDto.name;
     todo.due_date = createTodoDto.due_date;
+    todo.user = this.cls.get('user');
     todo.project = project;
 
     return await this.todoRepository.insert(todo);
@@ -65,7 +61,10 @@ export class TodoService {
     id: number,
     upteTodoDto: UpdateTodoDto,
   ): Promise<UpdateResult> {
-    const todo = await this.todoRepository.findOneBy({ id });
+    const todo = await this.todoRepository.findOneBy({
+      id,
+      user_id: this.cls.get('user').id,
+    });
 
     let project: Project;
 
@@ -85,7 +84,10 @@ export class TodoService {
   }
 
   async deleteTodo(id: number): Promise<DeleteResult> {
-    const todo = await this.todoRepository.findOneBy({ id });
+    const todo = await this.todoRepository.findOneBy({
+      id,
+      user_id: this.cls.get('user').id,
+    });
 
     if (!todo) throw new NotFoundException('Todo does not exist!');
 

@@ -1,6 +1,6 @@
 import { User } from 'src/entities/user';
 
-export class GetUserDto {
+export class UserDto {
   id: number;
 
   name: string;

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -17,7 +18,9 @@ import {
   UpdateProjectCommand,
 } from './commands/impl';
 import { GetAllProjectQuery, GetProjectQuery } from './queries/impl';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('projects')
 export class ProjectController {
   constructor(

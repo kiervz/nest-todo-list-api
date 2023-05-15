@@ -8,6 +8,9 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
+import { User } from './user';
+import { UserDto } from 'src/user/dto/user.dto';
+import { ProjectDto } from 'src/project/dto/project.dto';
 
 export enum TodoStatus {
   NOT_STARTED = 'Not Started',
@@ -19,6 +22,20 @@ export enum TodoStatus {
 export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  user_id: number;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
+  user: UserDto;
+
+  @Column({ nullable: true })
+  project_id: number;
+
+  @ManyToOne(() => Project)
+  @JoinColumn({ name: 'project_id' })
+  project: ProjectDto;
 
   @Column()
   name: string;
@@ -38,11 +55,4 @@ export class Todo {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @Column({ nullable: true })
-  project_id: number;
-
-  @ManyToOne(() => Project)
-  @JoinColumn({ name: 'project_id' })
-  project: Project;
 }
