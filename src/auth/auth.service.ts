@@ -10,10 +10,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user';
 import { InsertResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { GenerateTokenDto } from './dto/generate-token.dto';
-import { SignInUserDto } from './dto/sign-in-user.dto';
+import { GenerateTokenDto, SignInUserDto, SignUpUserDto } from './dto';
 import { ClsService } from 'nestjs-cls';
-import { SignUpUserDto } from './dto/sign-up-user.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +21,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly cls: ClsService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async signIn(signInUserDto: SignInUserDto) {
@@ -62,6 +62,22 @@ export class AuthService {
     user.name = signUpUserDto.name;
     user.email = signUpUserDto.email;
     user.password = await this.hashData(signUpUserDto.password);
+
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        subject: 'Welcome to Todo List ✔',
+        template: './welcome',
+        context: {
+          username: user.name,
+        },
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     return this.userRepository.insert(user);
   }

@@ -9,6 +9,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ClsModule } from 'nestjs-cls';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { emailSourceOptions } from './email/email-source';
 
 @Module({
   imports: [
@@ -21,9 +23,10 @@ import { ClsModule } from 'nestjs-cls';
       global: true,
       middleware: { mount: true },
     }),
+    MailerModule.forRoot(emailSourceOptions),
+    TypeOrmModule.forRoot(dataSourceOptions),
     TodoModule,
     ProjectModule,
-    TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
     AuthModule,
   ],
