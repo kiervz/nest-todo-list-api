@@ -9,16 +9,16 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { SignInUserDto } from './dto/sign-in-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   RefreshTokenCommand,
   SignInUserCommand,
   SignOutUserCommand,
+  SignUpUserCommand,
 } from './commands/impl';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GetUserByIdQuery } from './queries/impl';
+import { RefreshTokenDto, SignInUserDto, SignUpUserDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +30,11 @@ export class AuthController {
   @Post('login')
   async signIn(@Body() signInUserDto: SignInUserDto) {
     return await this.commandBus.execute(new SignInUserCommand(signInUserDto));
+  }
+
+  @Post('register')
+  async signup(@Body() signUpUserDto: SignUpUserDto) {
+    return await this.commandBus.execute(new SignUpUserCommand(signUpUserDto));
   }
 
   @UseGuards(JwtAuthGuard)

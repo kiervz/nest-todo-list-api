@@ -2,16 +2,18 @@ import {
   ForbiddenException,
   Injectable,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { GenerateTokenDto } from './dto/generate-token.dto';
 import { SignInUserDto } from './dto/sign-in-user.dto';
 import { ClsService } from 'nestjs-cls';
+import { SignUpUserDto } from './dto/sign-up-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +47,23 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async signUp(signUpUserDto: SignUpUserDto): Promise<InsertResult> {
+    const isEmailExist = await this.userRepository.findOne({
+      where: { email: signUpUserDto.email },
+      select: { email: true },
+    });
+
+    if (isEmailExist)
+      throw new UnprocessableEntityException('Email already exist!');
+
+    const user = new User();
+    user.name = signUpUserDto.name;
+    user.email = signUpUserDto.email;
+    user.password = await this.hashData(signUpUserDto.password);
+
+    return this.userRepository.insert(user);
   }
 
   private async generateToken(user: User): Promise<GenerateTokenDto> {
