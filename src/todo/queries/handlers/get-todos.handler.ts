@@ -9,12 +9,9 @@ export class GetTodosHandler implements IQueryHandler<GetTodosQuery> {
   constructor(private readonly todoService: TodoService) {}
 
   async execute(query: GetTodosQuery): Promise<Pagination<TodoDto>> {
-    const { req } = query;
+    const { page, limit } = query;
 
-    const options: IPaginationOptions = {
-      page: req.query.hasOwnProperty('page') ? +req.query.page : 1,
-      limit: req.query.hasOwnProperty('limit') ? +req.query.limit : 10,
-    };
+    const options: IPaginationOptions = { page, limit };
 
     return this.todoService.getAllTodo(options);
   }

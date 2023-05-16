@@ -8,7 +8,8 @@ import {
   Post,
   ParseIntPipe,
   UseGuards,
-  Request,
+  Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -30,8 +31,11 @@ export class TodoController {
   ) {}
 
   @Get()
-  async get(@Request() req) {
-    return await this.queryBus.execute(new GetTodosQuery(req));
+  async get(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit,
+  ) {
+    return await this.queryBus.execute(new GetTodosQuery(page, limit));
   }
 
   @Get('/:id')
