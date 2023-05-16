@@ -6,9 +6,13 @@ import { CreateTodoDto } from './dto/create-todo.dto';
 import { ProjectService } from 'src/project/project.service';
 import { Project } from 'src/entities/project';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { TodoDto } from './dto/todo.dto';
-import { TodosDto } from './dto/todos.dto';
 import { ClsService } from 'nestjs-cls';
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
+import { TODO_SERIALIZE } from 'src/serialization';
 
 @Injectable()
 export class TodoService {
@@ -18,24 +22,24 @@ export class TodoService {
     private readonly cls: ClsService,
   ) {}
 
-  async getAllTodo(): Promise<TodosDto> {
-    const todos = await this.todoRepository.find({
+  async getAllTodo(options: IPaginationOptions): Promise<Pagination<Todo>> {
+    return paginate<Todo>(this.todoRepository, options, {
       where: { user_id: this.cls.get('user').id },
       relations: ['user', 'project'],
+      select: TODO_SERIALIZE,
     });
-
-    return new TodosDto(todos);
   }
 
   async getTodoById(id: number): Promise<Todo> {
     const todo = await this.todoRepository.findOne({
       where: { id, user_id: this.cls.get('user').id },
       relations: ['user', 'project'],
+      select: TODO_SERIALIZE,
     });
 
     if (!todo) throw new NotFoundException('Todo does not exist!');
 
-    return new TodoDto(todo);
+    return todo;
   }
 
   async createTodo(createTodoDto: CreateTodoDto) {

@@ -8,6 +8,7 @@ import {
   Post,
   ParseIntPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -29,8 +30,8 @@ export class TodoController {
   ) {}
 
   @Get()
-  async get() {
-    return await this.queryBus.execute(new GetTodosQuery());
+  async get(@Request() req) {
+    return await this.queryBus.execute(new GetTodosQuery(req));
   }
 
   @Get('/:id')

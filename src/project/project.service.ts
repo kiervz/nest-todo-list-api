@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -10,6 +9,7 @@ import { DeleteResult, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ClsService } from 'nestjs-cls';
+import { PROJECT_SERIALIZE } from 'src/serialization';
 
 @Injectable()
 export class ProjectService {
@@ -21,13 +21,14 @@ export class ProjectService {
   async getAllProject(): Promise<Project[]> {
     return await this.projectRepository.find({
       where: { user_id: this.cls.get('user').id },
+      select: PROJECT_SERIALIZE,
     });
   }
 
   async getProjectById(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOneBy({
-      id,
-      user_id: this.cls.get('user').id,
+    const project = await this.projectRepository.findOne({
+      where: { id, user_id: this.cls.get('user').id },
+      select: PROJECT_SERIALIZE,
     });
 
     if (!project) throw new NotFoundException('Project does not exist!');
