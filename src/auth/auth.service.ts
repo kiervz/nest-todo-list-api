@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   HttpStatus,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import { ClsService } from 'nestjs-cls';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserDto } from 'src/user/dto/user.dto';
 import {
+  EXPIRATION_ONE_HOUR,
   VerificationType,
   compareData,
   generateRandomNumber,
@@ -134,7 +136,7 @@ export class AuthService {
   }
 
   private async sendEmailVerification(user: UserDto) {
-    const expirationTime = new Date(Date.now() + 60 * 60 * 1000);
+    const expirationTime = new Date(Date.now() + EXPIRATION_ONE_HOUR);
 
     const userVerification = await this.userVerificationRepository.save({
       email: user.email,
@@ -202,12 +204,43 @@ export class AuthService {
 
       return {
         statusCode: HttpStatus.OK,
-        message: 'Email successfully verified!',
+        message: 'Your email has been successfully verified!',
       };
     } else {
       throw new BadRequestException(
         'Verification code is invalid, please try again!',
       );
     }
+  }
+
+  async emailVerification(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException('User does not exist!');
+    }
+
+    // Check if an email has a pending verification that has not expired yet.
+    const emailVerification = await this.userVerificationRepository.findOne({
+      where: {
+        email,
+        verified_at: IsNull(),
+        expired_at: MoreThan(new Date(Date.now())),
+      },
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    if (emailVerification) {
+      throw new BadRequestException('We already sent you verification code.');
+    }
+
+    this.sendEmailVerification(user);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'A verification code has been sent!',
+    };
   }
 }

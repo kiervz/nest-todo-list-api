@@ -21,3 +21,5 @@ export const compareData = async (
   const match = bcrypt.compare(enteredData, dbData);
   return match;
 };
+
+export const EXPIRATION_ONE_HOUR = 60 * 60 * 1000;

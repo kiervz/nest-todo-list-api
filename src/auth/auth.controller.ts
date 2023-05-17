@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
+  EmailVerificationCommand,
   EmailVerifyCommand,
   RefreshTokenCommand,
   SignInUserCommand,
@@ -24,6 +25,7 @@ import {
   SignInUserDto,
   SignUpUserDto,
   EmailVerifyDto,
+  EmailVerificationDto,
 } from './dto';
 
 @Controller('auth')
@@ -70,5 +72,12 @@ export class AuthController {
   @Post('email/verify')
   async emailVerifyToken(@Body() emailVerifyDto: EmailVerifyDto) {
     return this.commandBus.execute(new EmailVerifyCommand(emailVerifyDto));
+  }
+
+  @Post('email/verification')
+  async emailVerification(@Body() emailVerificationDto: EmailVerificationDto) {
+    return this.commandBus.execute(
+      new EmailVerificationCommand(emailVerificationDto.email),
+    );
   }
 }
