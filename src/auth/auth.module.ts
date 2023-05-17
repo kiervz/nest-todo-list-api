@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { QueryHandlers } from './queries/handlers';
+import { UserVerification } from 'src/entities/user-verification';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { QueryHandlers } from './queries/handlers';
     }),
     UserModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, UserVerification]),
     CqrsModule,
   ],
   controllers: [AuthController],

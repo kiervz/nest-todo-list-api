@@ -11,12 +11,7 @@ import {
 import { User } from './user';
 import { UserDto } from 'src/user/dto/user.dto';
 import { ProjectDto } from 'src/project/dto/project.dto';
-
-export enum TodoStatus {
-  NOT_STARTED = 'Not Started',
-  IN_PROGRESS = 'In Progress',
-  DONE = 'Done',
-}
+import { TodoStatus } from 'src/utils';
 
 @Entity({ name: 'todos' })
 export class Todo {

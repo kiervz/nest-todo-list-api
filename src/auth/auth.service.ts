@@ -8,16 +8,25 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user';
+import { UserVerification } from 'src/entities/user-verification';
 import { InsertResult, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { GenerateTokenDto, SignInUserDto, SignUpUserDto } from './dto';
 import { ClsService } from 'nestjs-cls';
 import { MailerService } from '@nestjs-modules/mailer';
+import { UserDto } from 'src/user/dto/user.dto';
+import {
+  VerificationType,
+  compareData,
+  generateRandomNumber,
+  hashData,
+} from 'src/utils';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(UserVerification)
+    private userVerificationRepository: Repository<UserVerification>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly cls: ClsService,
@@ -31,10 +40,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException();
 
-    const isMatch = await this.compareData(
-      signInUserDto.password,
-      user.password,
-    );
+    const isMatch = await compareData(signInUserDto.password, user.password);
 
     this.cls.set('user', user);
 
@@ -61,23 +67,9 @@ export class AuthService {
     const user = new User();
     user.name = signUpUserDto.name;
     user.email = signUpUserDto.email;
-    user.password = await this.hashData(signUpUserDto.password);
+    user.password = await hashData(signUpUserDto.password);
 
-    this.mailerService
-      .sendMail({
-        to: user.email,
-        subject: 'Welcome to Todo List ✔',
-        template: './welcome',
-        context: {
-          username: user.name,
-        },
-      })
-      .then((success) => {
-        console.log(success);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await this.sendEmailVerification(user);
 
     return this.userRepository.insert(user);
   }
@@ -108,7 +100,7 @@ export class AuthService {
 
   private async updateRefreshToken(userId: number, refresh_token: string) {
     const hashedRefreshToken = refresh_token
-      ? await this.hashData(refresh_token)
+      ? await hashData(refresh_token)
       : null;
 
     return await this.userRepository.update(
@@ -125,10 +117,7 @@ export class AuthService {
 
     if (!user) throw new UnauthorizedException();
 
-    const refreshTokenMatches = await this.compareData(
-      token,
-      user.refresh_token,
-    );
+    const refreshTokenMatches = await compareData(token, user.refresh_token);
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
     const { accessToken, refreshToken } = await this.generateToken(user);
@@ -137,18 +126,34 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async hashData(data: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(data, salt);
-    return hash;
-  }
+  private async sendEmailVerification(user: UserDto) {
+    const expirationTime = new Date(Date.now() + 60 * 60 * 1000);
 
-  private async compareData(
-    enteredData: string,
-    dbData: string,
-  ): Promise<boolean> {
-    const match = await bcrypt.compare(enteredData, dbData);
-    return match;
+    const userVerification = await this.userVerificationRepository.save({
+      email: user.email,
+      verification_code: generateRandomNumber(6),
+      type: VerificationType.REGISTER,
+      expired_at: expirationTime,
+    });
+
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        subject: 'Email Verification - ToDo List ✔',
+        template: './email-verification',
+        context: {
+          username: user.name,
+          code: userVerification.verification_code,
+        },
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    return user;
   }
 
   async signOut(userId: number) {

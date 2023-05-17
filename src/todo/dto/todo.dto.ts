@@ -1,6 +1,7 @@
-import { Todo, TodoStatus } from 'src/entities/todo';
+import { Todo } from 'src/entities/todo';
 import { ProjectDto } from 'src/project/dto/project.dto';
 import { UserDto } from 'src/user/dto/user.dto';
+import { TodoStatus } from 'src/utils';
 
 export class TodoDto {
   id: number;

@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Simple Transactional Email</title>
+    <title>Email Verification</title>
     <style>
         /* -------------------------------------
           GLOBAL RESETS
@@ -119,6 +119,7 @@
             line-height: 1.4;
             margin: 0;
             margin-bottom: 30px;
+            font-size: 18px;
         }
 
         h1 {
@@ -373,8 +374,9 @@
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td>
-                                            <p>Hi {{ username }}, welcome!</p>
-                                            <p>We're thrilled to have you on board. With TodoList, you can create, manage, and organize your tasks effortlessly.</p>
+                                            <p>Hi {{ username }}, Welcome to the ToDo List!</p>
+                                            <p>Please verify your email address using the code below to complete account setup!</p>
+                                            <h4 class="align-center"><code>{{ code }}</code></h4>
                                         </td>
                                     </tr>
                                 </table>
