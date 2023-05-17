@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
+  EmailVerifyCommand,
   RefreshTokenCommand,
   SignInUserCommand,
   SignOutUserCommand,
@@ -18,7 +19,12 @@ import {
 } from './commands/impl';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { GetUserByIdQuery } from './queries/impl';
-import { RefreshTokenDto, SignInUserDto, SignUpUserDto } from './dto';
+import {
+  RefreshTokenDto,
+  SignInUserDto,
+  SignUpUserDto,
+  EmailVerifyDto,
+} from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -59,5 +65,10 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   logout(@Request() req) {
     return this.commandBus.execute(new SignOutUserCommand(req.user.id));
+  }
+
+  @Post('email/verify')
+  async emailVerifyToken(@Body() emailVerifyDto: EmailVerifyDto) {
+    return this.commandBus.execute(new EmailVerifyCommand(emailVerifyDto));
   }
 }

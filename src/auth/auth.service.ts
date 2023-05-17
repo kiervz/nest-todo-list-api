@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ForbiddenException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
   UnprocessableEntityException,
@@ -9,8 +11,13 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user';
 import { UserVerification } from 'src/entities/user-verification';
-import { InsertResult, Repository } from 'typeorm';
-import { GenerateTokenDto, SignInUserDto, SignUpUserDto } from './dto';
+import { InsertResult, IsNull, MoreThan, Repository } from 'typeorm';
+import {
+  GenerateTokenDto,
+  SignInUserDto,
+  SignUpUserDto,
+  EmailVerifyDto,
+} from './dto';
 import { ClsService } from 'nestjs-cls';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserDto } from 'src/user/dto/user.dto';
@@ -162,5 +169,40 @@ export class AuthService {
     if (!user) throw new UnauthorizedException();
 
     return this.updateRefreshToken(userId, null);
+  }
+
+  async emailVerifyToken(emailVerifyDto: EmailVerifyDto) {
+    const emailVerification = await this.userVerificationRepository.findOne({
+      where: {
+        email: emailVerifyDto.email,
+        verified_at: IsNull(),
+        expired_at: MoreThan(new Date(Date.now())),
+      },
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    if (
+      emailVerification &&
+      Number(emailVerification.verification_code) === emailVerifyDto.token
+    ) {
+      await this.userVerificationRepository.update(
+        { id: emailVerification.id },
+        { verified_at: new Date(Date.now()) },
+      );
+
+      await this.userRepository.update(
+        { email: emailVerification.email },
+        { verified_at: new Date(Date.now()) },
+      );
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Email successfully verified!',
+      };
+    }
+
+    throw new BadRequestException('Email is not verified, please try again!');
   }
 }
