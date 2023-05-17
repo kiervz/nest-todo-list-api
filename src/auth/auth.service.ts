@@ -183,10 +183,13 @@ export class AuthService {
       },
     });
 
-    if (
-      emailVerification &&
-      Number(emailVerification.verification_code) === emailVerifyDto.token
-    ) {
+    if (!emailVerification) {
+      throw new BadRequestException(
+        'Verification code has expired, please try again!',
+      );
+    }
+
+    if (Number(emailVerification.verification_code) === emailVerifyDto.token) {
       await this.userVerificationRepository.update(
         { id: emailVerification.id },
         { verified_at: new Date(Date.now()) },
@@ -201,8 +204,10 @@ export class AuthService {
         statusCode: HttpStatus.OK,
         message: 'Email successfully verified!',
       };
+    } else {
+      throw new BadRequestException(
+        'Verification code is invalid, please try again!',
+      );
     }
-
-    throw new BadRequestException('Email is not verified, please try again!');
   }
 }
