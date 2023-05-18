@@ -26,6 +26,7 @@ export class TodoDto {
       id: todo.user.id,
       name: todo.user.name,
       email: todo.user.email,
+      verified_at: todo.user.verified_at,
     };
     if (todo.project) {
       this.project = {
